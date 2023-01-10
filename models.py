@@ -1,9 +1,11 @@
+from typing import Optional, Union, overload
+
 import torch
 from collections import OrderedDict
-from torch import nn
-
+from torch import nn, device, dtype, Tensor
 
 # from train import generate_image
+from torch.nn.modules.module import T
 
 
 def dense(i, o):
@@ -40,7 +42,25 @@ class CPPN(nn.Module):
         self.network = nn.Sequential(OrderedDict(layers))
 
     def forward(self, x):
-        return self.network(x, device=x.device)
+        return self.network(x)
+
+    @overload
+    def to(self: T, device: Optional[Union[int, device]] = ..., dtype: Optional[Union[dtype, str]] = ...,
+           non_blocking: bool = ...) -> T:
+        ...
+
+    @overload
+    def to(self: T, dtype: Union[dtype, str], non_blocking: bool = ...) -> T:
+        ...
+
+    @overload
+    def to(self: T, tensor: Tensor, non_blocking: bool = ...) -> T:
+        ...
+
+    def to(self, *args, **kwargs):
+        self = super().to(*args, **kwargs)
+        self.network = self.network.to(*args, **kwargs)
+        return self
 
     @staticmethod
     def positional_encode(x, y, bins):
