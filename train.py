@@ -48,7 +48,7 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
 
                 if batch % 100 == 0:
                     loss, current = loss.item(), batch * len(X)
-                    print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+                    print(f"loss: {loss:>7f}  [{(current / size * 100):.2f}%]")
 
             print("Epoch finished. Saving image...")
             generate_image(model, (channels, 128, 128),
