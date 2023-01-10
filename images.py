@@ -19,13 +19,12 @@ def positional_encode(x, y, bins):
 
 
 def generate_image(model: nn.Module, image_shape, output_path, latent_dim=3, positional_encoding_bins=12, output_dim=3, device="cpu"):
+    model.to(device)
+
     to_pil = transforms.ToPILImage()
     to_tensor = transforms.ToTensor()
 
     image = torch.zeros(image_shape)
-
-    model.eval()
-
     for x in range(image_shape[1]):
         for y in range(image_shape[2]):
             X = positional_encode(x/image_shape[0], y/image_shape[1], positional_encoding_bins)

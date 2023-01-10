@@ -18,6 +18,8 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
     if not os.path.exists(os.path.join(os.path.dirname(model_save_path), 'images')):
         os.makedirs(os.path.join(os.path.dirname(model_save_path), 'images'))
 
+    model.to(device)
+
     generate_image(model, (channels, 128, 128),
                    os.path.join(os.path.dirname(__file__), 'images', f"epoch-{0}.png"),
                    latent_dim=latent_dim, positional_encoding_bins=positional_encoding_bins, output_dim=channels, device=device)
@@ -53,7 +55,7 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
             print("Epoch finished. Saving image...")
             generate_image(model, (channels, 128, 128),
                            os.path.join(os.path.dirname(__file__), 'images', f"epoch-{epoch + 1}.png"),
-                           latent_dim=latent_dim, positional_encoding_bins=positional_encoding_bins, output_dim=channels)
+                           latent_dim=latent_dim, positional_encoding_bins=positional_encoding_bins, output_dim=channels, device=device)
 
     except KeyboardInterrupt:
         print("Training stopped early")
@@ -78,7 +80,6 @@ if __name__ == '__main__':
 
     model = CPPN(input_vector_length=args.latent_dim, num_layers=args.model_depth, num_nodes=args.model_width,
                  output_vector_length=args.output_dim, positional_encoding_bins=args.positional_encoding_bins)
-    model = model.to(args.device)
 
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
