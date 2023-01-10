@@ -22,9 +22,10 @@ class ShaderWriter:
         self.parameters = params
         self.language = language
         self.output_length = output_length
+        self.positional_encoding_bins = model.positional_encoding_bins
 
     def write_file(self, file_path: str):
-        z_length = self.parameters['input_layer']['weight'].shape[1] - 2
+        z_length = self.parameters['input_layer']['weight'].shape[1] - self.positional_encoding_bins * 4
 
         lines = [
             "/**\n",
@@ -112,7 +113,7 @@ class ShaderWriter:
 if __name__ == '__main__':
     output_length = 3
     model_save_path = "model.pth"
-    model = CPPN(input_vector_length=14, num_nodes=16, num_layers=9, output_vector_length=output_length)
+    model = CPPN(input_vector_length=12, num_nodes=16, num_layers=9, output_vector_length=output_length, positional_encoding_bins=12)
 
     if os.path.exists(model_save_path):
         print("Found existing model, loading...")

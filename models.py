@@ -1,6 +1,8 @@
 import torch
 from collections import OrderedDict
 from torch import nn
+
+
 # from train import generate_image
 
 
@@ -11,12 +13,20 @@ def dense(i, o):
     return layer
 
 
+"""
+    Input vector should be at least 12 dimensions long + z-length
+"""
+
+
 class CPPN(nn.Module):
-    def __init__(self, input_vector_length=3, num_layers=6, num_nodes=16, output_vector_length=3):
+    def __init__(self, input_vector_length=12, num_layers=6, num_nodes=16, output_vector_length=3,
+                 positional_encoding_bins=12):
         super().__init__()
 
+        self.positional_encoding_bins = positional_encoding_bins
+
         layers = [
-            ('input_layer', dense(input_vector_length, num_nodes))
+            ('input_layer', dense((positional_encoding_bins * 4) + 2 + input_vector_length, num_nodes))
         ]
 
         for i in range(num_layers):
@@ -31,6 +41,19 @@ class CPPN(nn.Module):
 
     def forward(self, x):
         return self.network(x)
+
+    @staticmethod
+    def positional_encode(x, y, bins):
+        x = x * bins
+        y = y * bins
+        x = int(x)
+        y = int(y)
+        encoding = torch.zeros(bins * 4)
+        encoding[x] = 1
+        encoding[bins + y] = 1
+        encoding[bins * 2 + x + y] = 1
+        encoding[bins * 3 + x - y] = 1
+        return encoding
 
 
 if __name__ == '__main__':

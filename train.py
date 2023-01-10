@@ -9,7 +9,7 @@ from models import CPPN
 
 def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.optim.Optimizer,
           model_save_path=os.path.join(os.path.dirname(__file__), "model.pth"), epochs=100, device="cpu", latent_dim=3,
-          channels=3):
+          channels=3, positional_encoding_bins=12):
     if os.path.exists(model_save_path):
         print("Found existing model, loading...")
         print("Loading model from {}".format(model_save_path))
@@ -17,6 +17,10 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
 
     if not os.path.exists(os.path.join(os.path.dirname(model_save_path), 'images')):
         os.makedirs(os.path.join(os.path.dirname(model_save_path), 'images'))
+
+    generate_image(model, (channels, 128, 128),
+                   os.path.join(os.path.dirname(__file__), 'images', f"epoch-{0}.png"),
+                   latent_dim=latent_dim, positional_encoding_bins=positional_encoding_bins, output_dim=channels, device=device)
 
     try:
         for epoch in range(epochs):
@@ -26,12 +30,14 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
             print(f"{size} total batches")
             model.train()
             for batch, (X, y) in enumerate(dataloader):
-                z = torch.zeros((X.shape[0], latent_dim))
-                X = torch.cat([X, z], 1)
+                if latent_dim > 0:
+                    z = torch.zeros((X.shape[0], latent_dim))
+                    X = torch.cat([X, z], 1)
+
                 X = X.to(torch.float32)
                 y = y.to(torch.float32)
 
-                X, y = X.to(device), y.to(device)
+                X, y = X.to(torch.device(device)), y.to(torch.device(device))
 
                 pred = model(X)
                 loss = loss_fn(pred, y)
@@ -45,9 +51,9 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
                     print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
             print("Epoch finished. Saving image...")
-            generate_image(model, (channels, 64, 64),
+            generate_image(model, (channels, 128, 128),
                            os.path.join(os.path.dirname(__file__), 'images', f"epoch-{epoch + 1}.png"),
-                           latent_dim=latent_dim)
+                           latent_dim=latent_dim, positional_encoding_bins=positional_encoding_bins, output_dim=channels)
 
     except KeyboardInterrupt:
         print("Training stopped early")
@@ -67,19 +73,20 @@ if __name__ == '__main__':
     parser.add_argument('--model_depth', type=int, default=9, help='Depth of the model')
     parser.add_argument('--latent_dim', type=int, default=12, help='Latent dimension of the model')
     parser.add_argument('--output_dim', type=int, default=3, help='Output dimension of the model')
+    parser.add_argument('--positional_encoding_bins', type=int, default=12, help='Number of positional encoding bins')
     args = parser.parse_args()
 
-    model = CPPN(input_vector_length=args.latent_dim + 2, num_layers=args.model_depth, num_nodes=args.model_width,
-                 output_vector_length=args.output_dim)
-    model.to(args.device)
+    model = CPPN(input_vector_length=args.latent_dim, num_layers=args.model_depth, num_nodes=args.model_width,
+                 output_vector_length=args.output_dim, positional_encoding_bins=args.positional_encoding_bins)
+    model = model.to(torch.device(args.device))
 
     loss_fn = nn.MSELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
     dataset = SingleImageDataset(args.image_path, alpha=args.output_dim == 4)
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
     train(dataloader, model, loss_fn, optimizer, model_save_path=args.model, epochs=args.epochs, device=args.device,
-          latent_dim=args.latent_dim, channels=args.output_dim)
+          latent_dim=args.latent_dim, channels=args.output_dim, positional_encoding_bins=model.positional_encoding_bins)
     print("Training finished")
     torch.save(model.state_dict(), args.model)
