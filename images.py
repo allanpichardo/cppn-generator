@@ -32,7 +32,9 @@ def generate_image(model: nn.Module, image_shape, output_path, latent_dim=3, pos
                 X = torch.cat([X, z], 1)
 
             X = X.to(torch.float32)
-            X = X.to(torch.device(device))
+            X = X.to(device)
+
+            model = model.to(device)
 
             out = model(X)
             image[0][x][y] = out[0][0]

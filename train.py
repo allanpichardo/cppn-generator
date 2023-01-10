@@ -37,7 +37,7 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
                 X = X.to(torch.float32)
                 y = y.to(torch.float32)
 
-                X, y = X.to(torch.device(device)), y.to(torch.device(device))
+                X, y = X.to(device), y.to(device)
 
                 pred = model(X)
                 loss = loss_fn(pred, y)
@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     model = CPPN(input_vector_length=args.latent_dim, num_layers=args.model_depth, num_nodes=args.model_width,
                  output_vector_length=args.output_dim, positional_encoding_bins=args.positional_encoding_bins)
-    model = model.to(torch.device(args.device))
+    model = model.to(args.device)
 
     loss_fn = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
