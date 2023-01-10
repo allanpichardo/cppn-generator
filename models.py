@@ -40,7 +40,7 @@ class CPPN(nn.Module):
         self.network = nn.Sequential(OrderedDict(layers))
 
     def forward(self, x):
-        return self.network(x)
+        return self.network(x, device=x.device)
 
     @staticmethod
     def positional_encode(x, y, bins):
