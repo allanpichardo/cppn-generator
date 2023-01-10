@@ -1,5 +1,8 @@
 # Created by https://www.toptal.com/developers/gitignore/api/pycharm,macos,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=pycharm,macos,venv
+model.pth
+images
+
 venv
 .idea
 __pycache__/
