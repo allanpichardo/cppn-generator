@@ -19,10 +19,6 @@ pyasn1-modules==0.2.8
 requests==2.28.1
 rsa==4.9
 six==1.16.0
-tensorboard-data-server==0.6.1
-tensorboard-plugin-wit==1.8.1
-tensorflow-estimator==2.11.0
-tensorflow-metal==0.7.0
 termcolor==2.1.1
 torch==1.13.1
 torchaudio==0.13.1
