@@ -17,7 +17,7 @@ def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.O
     if not os.path.exists(os.path.join(os.path.dirname(model_save_path), 'images')):
         os.makedirs(os.path.join(os.path.dirname(model_save_path), 'images'))
 
-    model.generate_image(model, (channels, 128, 128),
+    model.generate_image((channels, 128, 128),
                          os.path.join(os.path.dirname(__file__), 'images', f"epoch-0.png"),
                          latent_dim=latent_dim)
 
@@ -45,10 +45,10 @@ def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.O
 
                 if batch % 100 == 0:
                     loss, current = loss.item(), batch * len(X)
-                    print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+                    print(f"loss: {loss:>7f}  [{current/size * 100:.2f}]%")
 
             print("Epoch finished. Saving image...")
-            model.generate_image(model, (channels, 128, 128),
+            model.generate_image((channels, 128, 128),
                            os.path.join(os.path.dirname(__file__), 'images', f"epoch-{epoch + 1}.png"),
                            latent_dim=latent_dim)
 
