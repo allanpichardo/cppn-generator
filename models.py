@@ -34,6 +34,10 @@ class CPPN(nn.Module):
     def forward(self, x):
         return self.network(x)
 
+    @property
+    def device(self):
+        return next(self.parameters()).device
+
     def generate_image(self, image_shape, output_path, latent_dim=3):
         to_pil = transforms.ToPILImage()
         to_tensor = transforms.ToTensor()
@@ -46,6 +50,9 @@ class CPPN(nn.Module):
                 if latent_dim > 0:
                     z = torch.zeros((X.shape[0], latent_dim))
                     X = torch.cat([X, z], 1)
+
+                X = X.to(torch.float32)
+                X = X.to(self.device)
 
                 out = self.forward(X)
                 image[0][y][x] = out[0][0]
@@ -63,7 +70,7 @@ class CPPN(nn.Module):
 
 
 if __name__ == '__main__':
-    model = CPPN(num_layers=9, num_nodes=32).to('cpu')
-    model.generate_image((3, 64, 64), 'test.jpg', latent_dim=1)
+    model = CPPN(num_layers=9, num_nodes=32).to('mps')
+    model.generate_image((3, 128, 128), 'test.jpg', latent_dim=1)
 
     # generate_image(model, (3, 64, 64), 'test.jpg', latent_dim=1)

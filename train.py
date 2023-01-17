@@ -2,12 +2,11 @@ import torch
 from torch import nn
 from torch.utils.data import DataLoader
 import os
-from images import generate_image
 from datasets import SingleImageDataset
 from models import CPPN
 
 
-def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.optim.Optimizer,
+def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.Optimizer,
           model_save_path=os.path.join(os.path.dirname(__file__), "model.pth"), epochs=100, device="cpu", latent_dim=3,
           channels=3):
     if os.path.exists(model_save_path):
@@ -17,6 +16,10 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
 
     if not os.path.exists(os.path.join(os.path.dirname(model_save_path), 'images')):
         os.makedirs(os.path.join(os.path.dirname(model_save_path), 'images'))
+
+    model.generate_image(model, (channels, 128, 128),
+                         os.path.join(os.path.dirname(__file__), 'images', f"epoch-0.png"),
+                         latent_dim=latent_dim)
 
     try:
         for epoch in range(epochs):
@@ -45,7 +48,7 @@ def train(dataloader: DataLoader, model: nn.Module, loss_fn, optimizer: torch.op
                     print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
             print("Epoch finished. Saving image...")
-            generate_image(model, (channels, 64, 64),
+            model.generate_image(model, (channels, 128, 128),
                            os.path.join(os.path.dirname(__file__), 'images', f"epoch-{epoch + 1}.png"),
                            latent_dim=latent_dim)
 
