@@ -9,7 +9,6 @@ lightweight_gan \
     --aug-prob 0.25 \
     --aug-types [translation,cutout,color] \
     --image-size 128 \
-    --amp \
     --dual-contrast-loss \
     --use-aim \
     --aim_repo /home/allan/cppn-logs
