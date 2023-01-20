@@ -33,7 +33,7 @@ from einops.layers.torch import Rearrange
 
 from adabelief_pytorch import AdaBelief
 
-from models import CPPN
+from lightweight_gan.models import CPPN
 
 # asserts
 

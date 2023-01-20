@@ -37,7 +37,7 @@ class SingleImageDataset(Dataset):
 
 
 if __name__ == '__main__':
-    test_dataset = SingleImageDataset('/Users/allanpichardo/sites/cppn-generator/test_image.png')
+    test_dataset = SingleImageDataset('/test_image.png')
     test_dataloader = DataLoader(test_dataset, batch_size=64, shuffle=True)
 
     train_features, train_labels = next(iter(test_dataloader))

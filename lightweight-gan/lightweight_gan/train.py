@@ -7,18 +7,18 @@ from models import CPPN
 
 
 def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.Optimizer,
-          model_save_path=os.path.join(os.path.dirname(__file__), "model.pth"), epochs=100, device="cpu", latent_dim=3,
+          model_save_path=os.path.join(os.path.dirname(__file__), "../../model.pth"), epochs=100, device="cpu", latent_dim=3,
           channels=3, test_image_size=128):
     if os.path.exists(model_save_path):
         print("Found existing model, loading...")
         print("Loading model from {}".format(model_save_path))
         model.load_state_dict(torch.load(model_save_path))
 
-    if not os.path.exists(os.path.join(os.path.dirname(model_save_path), 'images')):
-        os.makedirs(os.path.join(os.path.dirname(model_save_path), 'images'))
+    if not os.path.exists(os.path.join(os.path.dirname(model_save_path), '../../images')):
+        os.makedirs(os.path.join(os.path.dirname(model_save_path), '../../images'))
 
     model.generate_image((channels, test_image_size, test_image_size),
-                         os.path.join(os.path.dirname(__file__), 'images', f"epoch-0.png"),
+                         os.path.join(os.path.dirname(__file__), '../../images', f"epoch-0.png"),
                          latent_dim=latent_dim)
 
     try:
@@ -49,8 +49,8 @@ def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.O
 
             print("Epoch finished. Saving image...")
             model.generate_image((channels, test_image_size, test_image_size),
-                           os.path.join(os.path.dirname(__file__), 'images', f"epoch-{epoch + 1}.png"),
-                           latent_dim=latent_dim)
+                                 os.path.join(os.path.dirname(__file__), '../../images', f"epoch-{epoch + 1}.png"),
+                                 latent_dim=latent_dim)
 
     except KeyboardInterrupt:
         print("Training stopped early")
