@@ -632,7 +632,7 @@ class Generator(nn.Module):
 
     def forward(self, x):
         return self.cppn.generate_image((self.channels, self.image_size, self.image_size), latent_dim=self.latent_dim,
-                                        latent_vector=x)
+                                        latent_vector=x).cuda()
 
 
 class SimpleDecoder(nn.Module):
