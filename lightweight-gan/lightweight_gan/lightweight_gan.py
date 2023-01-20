@@ -624,15 +624,15 @@ class Generator(nn.Module):
         else:
             init_channel = 3
 
-        self.cppn = CPPN(input_vector_length=latent_dim + 2, output_vector_length=init_channel, num_layers=8,
-                         num_nodes=128)
+        self.cppn = CPPN(input_vector_length=latent_dim + 2, output_vector_length=init_channel, num_layers=6,
+                         num_nodes=20)
         self.image_size = image_size
         self.channels = init_channel
         self.latent_dim = latent_dim
 
     def forward(self, x):
         return self.cppn.generate_image((self.channels, self.image_size, self.image_size), latent_dim=self.latent_dim,
-                                        latent_vector=x).cuda()
+                                        latent_vector=x).to(self.cppn.device)
 
 
 class SimpleDecoder(nn.Module):
