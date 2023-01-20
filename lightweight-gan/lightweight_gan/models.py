@@ -45,9 +45,14 @@ class CPPN(nn.Module):
         to_tensor = transforms.ToTensor()
 
         image = torch.zeros(image_shape)
+        if latent_vector is not None:
+            image = image.repeat(latent_vector.shape[0], 1, 1, 1)
+
         step = 0
-        for x in range(image_shape[1]):
-            for y in range(image_shape[2]):
+        x_len = image_shape[1]
+        y_len = image_shape[2]
+        for x in range(x_len):
+            for y in range(y_len):
                 if verbose:
                     print(f"Image Progress: {step / (image_shape[1] * image_shape[2]) * 100:.2f}%", end="\r")
                     step += 1
@@ -66,19 +71,27 @@ class CPPN(nn.Module):
                 X = X.to(self.device)
 
                 out = self.forward(X)
-                image[0][y][x] = out[0][0]
-                if image_shape[0] > 1:
-                    image[1][y][x] = out[0][1]
-                    image[2][y][x] = out[0][2]
-                if image_shape[0] == 4:
-                    image[3][y][x] = out[0][3]
 
-        image = to_pil(image)
-        image = to_tensor(image)
+                if latent_vector is None:
+                    image[0][y][x] = out[0][0]
+                    if image_shape[0] > 1:
+                        image[1][y][x] = out[0][1]
+                        image[2][y][x] = out[0][2]
+                    if image_shape[0] == 4:
+                        image[3][y][x] = out[0][3]
+                else:
+                    image[:, 0, y, x] = out[:, 0]
+                    if image_shape[0] > 1:
+                        image[:, 1, y, x] = out[:, 1]
+                        image[:, 2, y, x] = out[:, 2]
+                    if image_shape[0] == 4:
+                        image[:, 3, y, x] = out[:, 3]
 
         if output_path is None:
             return image
 
+        image = to_pil(image)
+        image = to_tensor(image)
         image *= 255
         image = image.to(torch.uint8)
         write_jpeg(image, output_path)

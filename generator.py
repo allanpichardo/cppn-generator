@@ -6,7 +6,7 @@ if __name__ == '__main__':
     generator = Generator(image_size=128)
     generator.eval()
 
-    z = torch.randn(1, 256)
+    z = torch.randn(8, 256)
     x = generator(z)
 
     print(x.shape)
