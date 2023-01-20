@@ -111,7 +111,7 @@ class ShaderWriter:
 
 if __name__ == '__main__':
     output_length = 3
-    model_save_path = "../../model.pth"
+    model_save_path = "model.pth"
     model = CPPN(input_vector_length=14, num_nodes=16, num_layers=9, output_vector_length=output_length)
 
     if os.path.exists(model_save_path):
