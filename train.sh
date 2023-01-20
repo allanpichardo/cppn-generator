@@ -11,6 +11,5 @@ lightweight_gan \
     --image-size 128 \
     --amp \
     --dual-contrast-loss \
-    --transparent \
     --use-aim \
     --aim_repo /home/allan/cppn-logs
