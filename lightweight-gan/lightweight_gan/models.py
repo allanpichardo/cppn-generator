@@ -56,6 +56,7 @@ class CPPN(nn.Module):
 
                 if latent_vector is not None:
                     X = X.repeat(latent_vector.shape[0], 1)
+                    X = X.to(self.device)
 
                 if latent_dim > 0:
                     z = torch.zeros((X.shape[0], latent_dim)) if latent_vector is None else latent_vector
