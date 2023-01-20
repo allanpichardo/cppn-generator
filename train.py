@@ -8,7 +8,7 @@ from models import CPPN
 
 def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.Optimizer,
           model_save_path=os.path.join(os.path.dirname(__file__), "model.pth"), epochs=100, device="cpu", latent_dim=3,
-          channels=3):
+          channels=3, test_image_size=128):
     if os.path.exists(model_save_path):
         print("Found existing model, loading...")
         print("Loading model from {}".format(model_save_path))
@@ -17,7 +17,7 @@ def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.O
     if not os.path.exists(os.path.join(os.path.dirname(model_save_path), 'images')):
         os.makedirs(os.path.join(os.path.dirname(model_save_path), 'images'))
 
-    model.generate_image((channels, 128, 128),
+    model.generate_image((channels, test_image_size, test_image_size),
                          os.path.join(os.path.dirname(__file__), 'images', f"epoch-0.png"),
                          latent_dim=latent_dim)
 
@@ -48,7 +48,7 @@ def train(dataloader: DataLoader, model: CPPN, loss_fn, optimizer: torch.optim.O
                     print(f"loss: {loss:>7f}  [{current/size * 100:.2f}]%")
 
             print("Epoch finished. Saving image...")
-            model.generate_image((channels, 128, 128),
+            model.generate_image((channels, test_image_size, test_image_size),
                            os.path.join(os.path.dirname(__file__), 'images', f"epoch-{epoch + 1}.png"),
                            latent_dim=latent_dim)
 
@@ -70,6 +70,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_depth', type=int, default=9, help='Depth of the model')
     parser.add_argument('--latent_dim', type=int, default=12, help='Latent dimension of the model')
     parser.add_argument('--output_dim', type=int, default=3, help='Output dimension of the model')
+    parser.add_argument('--test_image_size', type=int, default=128, help='Size of the test images')
     args = parser.parse_args()
 
     model = CPPN(input_vector_length=args.latent_dim + 2, num_layers=args.model_depth, num_nodes=args.model_width,
@@ -83,6 +84,6 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, batch_size=args.batch_size, shuffle=True)
 
     train(dataloader, model, loss_fn, optimizer, model_save_path=args.model, epochs=args.epochs, device=args.device,
-          latent_dim=args.latent_dim, channels=args.output_dim)
+          latent_dim=args.latent_dim, channels=args.output_dim, test_image_size=args.test_image_size)
     print("Training finished")
     torch.save(model.state_dict(), args.model)

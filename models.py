@@ -3,7 +3,6 @@ from collections import OrderedDict
 from torch import nn
 from torchvision.io import write_jpeg
 from torchvision import transforms
-# from train import generate_image
 
 
 def dense(i, o):
@@ -38,17 +37,28 @@ class CPPN(nn.Module):
     def device(self):
         return next(self.parameters()).device
 
-    def generate_image(self, image_shape, output_path, latent_dim=3):
+    """
+    When output_path is None, the image is returned as a tensor.
+    """
+    def generate_image(self, image_shape, output_path=None, latent_dim=3, verbose=False, latent_vector=None):
         to_pil = transforms.ToPILImage()
         to_tensor = transforms.ToTensor()
 
         image = torch.zeros(image_shape)
+        step = 0
         for x in range(image_shape[1]):
             for y in range(image_shape[2]):
+                if verbose:
+                    print(f"Image Progress: {step / (image_shape[1] * image_shape[2]) * 100:.2f}%", end="\r")
+                    step += 1
+
                 X = torch.tensor([[float(x / image_shape[2]), float(y / image_shape[1])]])
 
+                if latent_vector is not None:
+                    X = X.repeat(latent_vector.shape[0], 1)
+
                 if latent_dim > 0:
-                    z = torch.zeros((X.shape[0], latent_dim))
+                    z = torch.zeros((X.shape[0], latent_dim)) if latent_vector is None else latent_vector
                     X = torch.cat([X, z], 1)
 
                 X = X.to(torch.float32)
@@ -64,13 +74,16 @@ class CPPN(nn.Module):
 
         image = to_pil(image)
         image = to_tensor(image)
+
+        if output_path is None:
+            return image
+
         image *= 255
         image = image.to(torch.uint8)
         write_jpeg(image, output_path)
 
 
 if __name__ == '__main__':
-    model = CPPN(num_layers=9, num_nodes=32).to('mps')
-    model.generate_image((3, 128, 128), 'test.jpg', latent_dim=1)
-
-    # generate_image(model, (3, 64, 64), 'test.jpg', latent_dim=1)
+    model = CPPN(num_layers=9, num_nodes=32).to('cpu')
+    out = model.generate_image((3, 64, 64), latent_dim=1, verbose=True, latent_vector=torch.tensor([[0.5]]))
+    print(out.shape)
