@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 lightweight_gan \
-    --data ./path/to/images \
+    --data /home/allan/portrait-generator/collages \
     --name {name of run} \
     --batch-size 16 \
     --gradient-accumulate-every 4 \
@@ -13,4 +13,4 @@ lightweight_gan \
     --dual-contrast-loss \
     --transparent \
     --use-aim \
-    --aim_repo ~/cppn-logs
+    --aim_repo /home/allan/cppn-logs
