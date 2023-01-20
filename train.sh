@@ -2,7 +2,7 @@
 
 lightweight_gan \
     --data /home/allan/portrait-generator/collages \
-    --name {name of run} \
+    --name cppn-test-1 \
     --batch-size 16 \
     --gradient-accumulate-every 4 \
     --num-train-steps 200000 \
