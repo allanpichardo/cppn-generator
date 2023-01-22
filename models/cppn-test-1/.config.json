@@ -1,1 +1,0 @@
-{"image_size": 128, "transparent": false, "greyscale": false, "syncbatchnorm": false, "disc_output_size": 1, "optimizer": "adam", "attn_res_layers": [32], "freq_chan_attn": false}
